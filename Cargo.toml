@@ -11,6 +11,7 @@ description = "Fast image viewer. Powered by Rust"
 clap = { version = "3.2.20", features = ["derive"] } # for input
 image = "0.24" # for reading image file
 show-image = "0.12" # for displaying the image and contains "winit" for native windows
-# pixels = "0.9" # for displaying the image
 thiserror = "1.0" # for error handling and conversion
 
+[build-dependencies]
+winres = "0.1"

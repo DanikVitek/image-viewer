@@ -10,10 +10,15 @@ use image::{io::Reader, DynamicImage};
 use show_image::{
     create_window,
     event::{ElementState, KeyboardInput, VirtualKeyCode, WindowEvent, WindowKeyboardInputEvent},
-    ImageInfo, ImageView, WindowOptions, WindowProxy,
+    Color, ImageInfo, ImageView, WindowOptions, WindowProxy,
 };
 
 const MIN_SIZE: [u32; 2] = [300; 2];
+const BACKGROUND_COLOR: Color = Color::rgb(
+    0x20 as f64 / 255f64,
+    0x20 as f64 / 255f64,
+    0x20 as f64 / 255f64,
+);
 
 #[show_image::main]
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -23,10 +28,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let window = create_window(
         "Image viewer",
-        WindowOptions::new().set_size(Some([
-            max(MIN_SIZE[0], image.width()),
-            max(MIN_SIZE[1], image.height()),
-        ])),
+        WindowOptions::new()
+            .set_size(Some([
+                max(MIN_SIZE[0], image.width()),
+                max(MIN_SIZE[1], image.height()),
+            ]))
+            .set_background_color(BACKGROUND_COLOR),
     )?;
     window.set_image("img", image_view)?;
 
