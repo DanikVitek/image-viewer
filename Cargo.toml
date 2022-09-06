@@ -2,10 +2,14 @@
 name = "image-viewer"
 version = "0.1.0"
 edition = "2021"
+authors = ["Danik_Vitek"]
+description = "Fast image viewer. Powered by Rust"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = { version = "3.2.20", features = ["derive"] }
-show-image = "0.12.3"
-thiserror = "1.0.34"
+clap = { version = "3.2.20", features = ["derive"] } # for input
+image = "0.24" # for reading image file
+pixels = "0.9" # ford isplaying the image
+thiserror = "1.0" # for error handling and conversion
+winit = "0.27" # for native windows
