@@ -10,7 +10,7 @@ use image::{io::Reader, DynamicImage};
 use show_image::{
     create_window,
     event::{ElementState, KeyboardInput, VirtualKeyCode, WindowEvent, WindowKeyboardInputEvent},
-    ImageInfo, ImageView, WindowOptions,
+    ImageInfo, ImageView, WindowOptions, WindowProxy,
 };
 
 const MIN_SIZE: [u32; 2] = [300; 2];
@@ -34,36 +34,50 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut ignore_fs_input = false;
 
     for event in window.event_channel()? {
-        match event {
-            WindowEvent::KeyboardInput(WindowKeyboardInputEvent {
-                input:
-                    KeyboardInput {
-                        key_code: Some(key_code),
-                        state,
-                        ..
-                    },
-                ..
-            }) => match key_code {
-                VirtualKeyCode::Escape => break,
-                VirtualKeyCode::F11 if state == ElementState::Pressed && !ignore_fs_input => {
-                    is_fullscreen = !is_fullscreen;
-                    ignore_fs_input = true;
-
-                    window.run_function(move |mut ctx| {
-                        ctx.set_borderless(is_fullscreen);
-                        ctx.set_fullscreen(is_fullscreen);
-                    });
-                }
-                VirtualKeyCode::F11 if state == ElementState::Released && ignore_fs_input => {
-                    ignore_fs_input = false;
-                }
-                _ => {}
-            },
-            _ => {}
+        if !process_window_event(event, &window, &mut is_fullscreen, &mut ignore_fs_input) {
+            break;
         }
     }
 
     Ok(())
+}
+
+fn process_window_event(
+    event: WindowEvent,
+    window: &WindowProxy,
+    is_fullscreen: &mut bool,
+    ignore_fs_input: &mut bool,
+) -> bool {
+    match event {
+        WindowEvent::KeyboardInput(WindowKeyboardInputEvent {
+            input:
+                KeyboardInput {
+                    key_code: Some(key_code),
+                    state,
+                    ..
+                },
+            ..
+        }) => match key_code {
+            VirtualKeyCode::Escape => return false,
+            VirtualKeyCode::F11 if state == ElementState::Pressed && !*ignore_fs_input => {
+                *is_fullscreen = !*is_fullscreen;
+                *ignore_fs_input = true;
+
+                let is_fullscreen = *is_fullscreen;
+                window.run_function(move |mut ctx| {
+                    ctx.set_borderless(is_fullscreen);
+                    ctx.set_fullscreen(is_fullscreen);
+                });
+            }
+            VirtualKeyCode::F11 if state == ElementState::Released && *ignore_fs_input => {
+                *ignore_fs_input = false;
+            }
+            _ => {}
+        },
+        _ => {}
+    }
+
+    true
 }
 
 fn get_image_view<'img>(image: &'img DynamicImage) -> crate::error::Result<ImageView<'img>> {
